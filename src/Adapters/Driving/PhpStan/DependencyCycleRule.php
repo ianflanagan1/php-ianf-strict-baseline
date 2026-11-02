@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\PhpStan;
+namespace IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan;
 
 use IanFlanagan\PhpBaseline\Core\DependencyCycles;
 use LogicException;

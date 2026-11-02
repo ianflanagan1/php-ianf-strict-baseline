@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\PhpStan;
+namespace IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan;
 
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Instanceof_;

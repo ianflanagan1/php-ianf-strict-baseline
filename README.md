@@ -5,7 +5,7 @@ The checks every PHP project of mine shares: the architecture (a functional core
 | Export | What it is |
 |---|---|
 | `config/deptrac.yaml` | deptrac layers for the roles, by directory, and which may depend on which |
-| `config/phpstan.neon` | spaze/phpstan-disallowed-calls bans on each effect, outside the roles allowed to perform it, and on dependency-injection containers; the baseline's own PHPStan rules, in `src/PhpStan/`; and level 4, the lowest at which PHPStan reports a match that leaves out a case |
+| `config/phpstan.neon` | spaze/phpstan-disallowed-calls bans on each effect, outside the roles allowed to perform it, and on dependency-injection containers; the baseline's own PHPStan rules, in `src/Adapters/Driving/PhpStan/`; and level 4, the lowest at which PHPStan reports a match that leaves out a case |
 | `config/pint.json` | The Pint settings, for a project's `pint.json` to extend |
 | `php-baseline rulebook` | Prints how the baseline enforces each clause of the rulebook, as the coverage listing the rulebook checks |
 
@@ -119,4 +119,4 @@ devbox run -- task setup
 devbox run -- task check   # composer.json, the tests (including the conformance tests), PHPStan, deptrac, Pint and the rulebook listing
 ```
 
-The package follows the rules it ships: `src/Core/` is pure, `src/PhpStan/` holds the PHPStan rules, and `bin/php-baseline` is the entrypoint. Its own `pint.json` extends `config/pint.json`, as a project's does.
+The package follows the rules it ships: `src/Core/` is pure, `src/Adapters/Driving/PhpStan/` holds the PHPStan rules, and `bin/php-baseline` is the entrypoint. Its own `pint.json` extends `config/pint.json`, as a project's does.

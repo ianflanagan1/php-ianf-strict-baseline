@@ -140,7 +140,7 @@ final class RulebookListing
     }
 
     /**
-     * A PHPStan rule of the baseline's own, in src/PhpStan/.
+     * A PHPStan rule of the baseline's own, in src/Adapters/Driving/PhpStan/.
      *
      * @return array<string, string>
      */

@@ -14,38 +14,38 @@ parametersSchema:
     phpBaselineAllowedParentClasses: listOf(string())
 
 rules:
-    - IanFlanagan\PhpBaseline\PhpStan\MatchDefaultArmRule
-    - IanFlanagan\PhpBaseline\PhpStan\SwitchOnClosedFamilyRule
-    - IanFlanagan\PhpBaseline\PhpStan\ParameterDefaultRule
-    - IanFlanagan\PhpBaseline\PhpStan\DependencyCycleRule
+    - IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\MatchDefaultArmRule
+    - IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\SwitchOnClosedFamilyRule
+    - IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\ParameterDefaultRule
+    - IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\DependencyCycleRule
 
 services:
     -
-        class: IanFlanagan\PhpBaseline\PhpStan\ClassDependencyCollector
+        class: IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\ClassDependencyCollector
         tags:
             - phpstan.collector
     -
-        class: IanFlanagan\PhpBaseline\PhpStan\InheritanceRule
+        class: IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\InheritanceRule
         arguments:
             allowedParents: %phpBaselineAllowedParentClasses%
         tags:
             - phpstan.rules.rule
     -
-        class: IanFlanagan\PhpBaseline\PhpStan\FunctionLengthRule
+        class: IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\FunctionLengthRule
         arguments:
             paths: %phpBaselineSizeLimitedPaths%
             root: %currentWorkingDirectory%
         tags:
             - phpstan.rules.rule
     -
-        class: IanFlanagan\PhpBaseline\PhpStan\ScriptLengthRule
+        class: IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\ScriptLengthRule
         arguments:
             paths: %phpBaselineSizeLimitedPaths%
             root: %currentWorkingDirectory%
         tags:
             - phpstan.rules.rule
     -
-        class: IanFlanagan\PhpBaseline\PhpStan\StaticStateRule
+        class: IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\StaticStateRule
         arguments:
             effectPaths: %phpBaselineEffectPaths%
             root: %currentWorkingDirectory%
