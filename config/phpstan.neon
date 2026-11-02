@@ -1,6 +1,7 @@
-# The effects a role may perform, from the architecture rulebook's vocabulary. Every effect is banned
-# outside adapters (src/Adapters/), the composition root (bin/ and public/) and tests; reading
-# configuration is banned outside the composition root and tests. Paths are from the directory
+# The code rulebook's rules, in PHP's terms. Every effect from the rulebook's vocabulary is banned
+# outside driving and driven adapters (src/Adapters/Driving/ and src/Adapters/Driven/), the
+# entrypoints (bin/ and public/) and tests; reading configuration is banned outside the
+# entrypoints and tests. Paths are from the directory
 # PHPStan runs in, which must be the project's root.
 #
 # Needs spaze/phpstan-disallowed-calls, which phpstan/extension-installer includes, or include its
@@ -8,17 +9,71 @@
 
 parametersSchema:
     phpBaselineEffectPaths: listOf(string())
-    phpBaselineCompositionRootPaths: listOf(string())
+    phpBaselineEntrypointPaths: listOf(string())
+    phpBaselineSizeLimitedPaths: listOf(string())
+    phpBaselineAllowedParentClasses: listOf(string())
+
+rules:
+    - IanFlanagan\PhpBaseline\PhpStan\MatchDefaultArmRule
+    - IanFlanagan\PhpBaseline\PhpStan\SwitchOnClosedFamilyRule
+    - IanFlanagan\PhpBaseline\PhpStan\ParameterDefaultRule
+    - IanFlanagan\PhpBaseline\PhpStan\DependencyCycleRule
+
+services:
+    -
+        class: IanFlanagan\PhpBaseline\PhpStan\ClassDependencyCollector
+        tags:
+            - phpstan.collector
+    -
+        class: IanFlanagan\PhpBaseline\PhpStan\InheritanceRule
+        arguments:
+            allowedParents: %phpBaselineAllowedParentClasses%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: IanFlanagan\PhpBaseline\PhpStan\FunctionLengthRule
+        arguments:
+            paths: %phpBaselineSizeLimitedPaths%
+            root: %currentWorkingDirectory%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: IanFlanagan\PhpBaseline\PhpStan\ScriptLengthRule
+        arguments:
+            paths: %phpBaselineSizeLimitedPaths%
+            root: %currentWorkingDirectory%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: IanFlanagan\PhpBaseline\PhpStan\StaticStateRule
+        arguments:
+            effectPaths: %phpBaselineEffectPaths%
+            root: %currentWorkingDirectory%
+        tags:
+            - phpstan.rules.rule
 
 parameters:
-    # Where effects are allowed: adapters, the composition root and tests.
+    # Level 4 is the lowest at which PHPStan reports a match that leaves out a case. A project may
+    # set a higher level, not a lower one.
+    level: 4
+    # Where functions are held to 50 lines: adapters and the entrypoints.
+    phpBaselineSizeLimitedPaths:
+        - src/Adapters/Driving/*
+        - src/Adapters/Driven/*
+        - bin/*
+        - public/*
+    # The classes a class may extend, besides PHP's own exceptions: framework base classes.
+    phpBaselineAllowedParentClasses:
+        - PHPUnit\Framework\TestCase
+    # Where effects are allowed: adapters, the entrypoints and tests.
     phpBaselineEffectPaths:
-        - src/Adapters/*
+        - src/Adapters/Driving/*
+        - src/Adapters/Driven/*
         - bin/*
         - public/*
         - tests/*
-    # Where configuration may be read: the composition root and tests.
-    phpBaselineCompositionRootPaths:
+    # Where configuration may be read: the entrypoints and tests.
+    phpBaselineEntrypointPaths:
         - bin/*
         - public/*
         - tests/*
@@ -39,7 +94,7 @@ parameters:
                 - 'usleep()'
                 - 'time_nanosleep()'
                 - 'time_sleep_until()'
-            message: 'reads the clock; the core takes the time as a value, and the shell asks a clock port'
+            message: 'reads the clock; the core takes the time as a value, and an orchestrator asks a clock port'
             allowIn: %phpBaselineEffectPaths%
         -
             function:
@@ -139,8 +194,8 @@ parameters:
                 - 'putenv()'
                 - 'ini_get()'
                 - 'ini_set()'
-            message: 'reads configuration, which only the composition root does; pass the value in'
-            allowIn: %phpBaselineCompositionRootPaths%
+            message: 'reads configuration, which only an entrypoint does; pass the value in'
+            allowIn: %phpBaselineEntrypointPaths%
     disallowedMethodCalls:
         -
             method:
@@ -149,6 +204,18 @@ parameters:
             message: 'may read the clock; parse with createFromFormat(), or take the time from a clock port'
             allowIn: %phpBaselineEffectPaths%
     disallowedNamespaces:
+        -
+            namespace:
+                - 'Psr\Container\*'
+                - 'DI\*'
+                - 'Symfony\Component\DependencyInjection\*'
+                - 'Illuminate\Container\*'
+                - 'Illuminate\Contracts\Container\*'
+                - 'League\Container\*'
+                - 'Laminas\ServiceManager\*'
+                - 'Nette\DI\*'
+                - 'Pimple\*'
+            message: 'is a dependency-injection container; construct each adapter and orchestrator in the entrypoint and pass it in'
         -
             namespace:
                 - 'PDO'
@@ -196,8 +263,8 @@ parameters:
             superglobal:
                 - '$_ENV'
                 - '$_SERVER'
-            message: 'reads configuration, which only the composition root does; pass the value in'
-            allowIn: %phpBaselineCompositionRootPaths%
+            message: 'reads configuration, which only an entrypoint does; pass the value in'
+            allowIn: %phpBaselineEntrypointPaths%
         -
             superglobal:
                 - '$GLOBALS'

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use App\Adapters\SystemClock;
+use App\Adapters\Driven\SystemClock;
 
 final class ImportsAdapter
 {

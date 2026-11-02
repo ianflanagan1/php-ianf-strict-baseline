@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Adapters\SystemClock;
+use App\Adapters\Driven\SystemClock;
+use App\Adapters\Driving\Server;
 use App\Greeter;
 
-echo (new Greeter)->hello(), (new SystemClock)->now(), getenv('HOME'), PHP_EOL;
+echo (new Server(new Greeter))->handle(), (new SystemClock)->now(), getenv('HOME'), PHP_EOL;

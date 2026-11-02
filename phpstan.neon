@@ -8,7 +8,7 @@ parameters:
     checkMissingOverrideMethodAttribute: true
     paths:
         - src
-        - bin
+        - bin/php-baseline
         - tests
     excludePaths:
         # Breaks the rules on purpose

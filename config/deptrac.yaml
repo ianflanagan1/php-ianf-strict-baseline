@@ -1,17 +1,43 @@
-# The roles from the architecture rulebook's vocabulary, by directory, and which roles each may
-# depend on. bin/ and public/, the composition root, are in no layer, so they may use anything.
+# The roles from the code rulebook's vocabulary, by directory, and which roles each may
+# depend on. Ports have their own layer because a PHP driven adapter has to name the interface
+# it implements: orchestrators and driven adapters may both import a port, and a port only the
+# core. Driving adapters call orchestrators directly, and import no port. bin/ and public/, the
+# entrypoints, are in no layer, so they may use anything; a script is not a class, so nothing
+# can import one. A file under src/Adapters/ in neither Driving/ nor Driven/ is an orchestrator.
 # Directories are from the directory deptrac runs in, which must be the project's root.
+#
+# A dependency of mine (IanFlanagan\<Project>\...) takes its role from its namespace, which the
+# root-namespace rule ties to its directory: \Core\, \Ports\, \Adapters\Driving\ and
+# \Adapters\Driven\ give those roles, and everything else outside \Tests\ is an orchestrator. So
+# a project's core may use a library's core, and its driven adapters may implement a library's
+# ports, but its core can't call a library's orchestrators.
 deptrac:
   layers:
     - name: Core
       collectors:
         - type: directory
           value: ^%projectDirectory%/src/Core/.*
-    - name: Adapter
+        - type: classNameRegex
+          value: '#^IanFlanagan\\[A-Za-z0-9]+\\Core\\#'
+    - name: Port
       collectors:
         - type: directory
-          value: ^%projectDirectory%/src/Adapters/.*
-    - name: Shell
+          value: ^%projectDirectory%/src/Ports/.*
+        - type: classNameRegex
+          value: '#^IanFlanagan\\[A-Za-z0-9]+\\Ports\\#'
+    - name: DrivingAdapter
+      collectors:
+        - type: directory
+          value: ^%projectDirectory%/src/Adapters/Driving/.*
+        - type: classNameRegex
+          value: '#^IanFlanagan\\[A-Za-z0-9]+\\Adapters\\Driving\\#'
+    - name: DrivenAdapter
+      collectors:
+        - type: directory
+          value: ^%projectDirectory%/src/Adapters/Driven/.*
+        - type: classNameRegex
+          value: '#^IanFlanagan\\[A-Za-z0-9]+\\Adapters\\Driven\\#'
+    - name: Orchestrator
       collectors:
         - type: bool
           must:
@@ -21,10 +47,26 @@ deptrac:
             - type: directory
               value: ^%projectDirectory%/src/Core/.*
             - type: directory
-              value: ^%projectDirectory%/src/Adapters/.*
+              value: ^%projectDirectory%/src/Ports/.*
+            - type: directory
+              value: ^%projectDirectory%/src/Adapters/(Driving|Driven)/.*
+        - type: bool
+          must:
+            - type: classNameRegex
+              value: '#^IanFlanagan\\[A-Za-z0-9]+\\#'
+          must_not:
+            - type: classNameRegex
+              value: '#^IanFlanagan\\[A-Za-z0-9]+\\(Core|Ports|Adapters\\Driving|Adapters\\Driven|Tests)\\#'
   ruleset:
     Core: ~
-    Shell:
+    Port:
       - Core
-    Adapter:
+    Orchestrator:
       - Core
+      - Port
+    DrivingAdapter:
+      - Core
+      - Orchestrator
+    DrivenAdapter:
+      - Core
+      - Port

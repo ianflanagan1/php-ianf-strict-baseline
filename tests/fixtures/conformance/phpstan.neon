@@ -3,7 +3,6 @@ includes:
     - ../../../config/phpstan.neon
 
 parameters:
-    level: 0
     paths:
         - src
         - bin
