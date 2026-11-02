@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ports;
 
-use App\Greeter;
+use App\Orchestrators\Greeter;
 
 interface ImportsOrchestrator
 {

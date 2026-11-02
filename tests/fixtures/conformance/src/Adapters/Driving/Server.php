@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\Driving;
 
-use App\Greeter;
+use App\Orchestrators\Greeter;
 
 /**
  * A driving adapter that keeps to its role: it answers a request by calling an orchestrator.

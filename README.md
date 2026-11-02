@@ -17,16 +17,16 @@ A file's directory decides its role:
 |---|---|---|---|
 | Core | `src/Core/` | The core | None |
 | Port | `src/Ports/` | The core | None: ports are interfaces |
-| Orchestrator | The rest of `src/` | The core, ports and other orchestrators | None: only through ports |
+| Orchestrator | `src/Orchestrators/` | The core, ports and other orchestrators | None: only through ports |
 | Driving adapter | `src/Adapters/Driving/` | The core, orchestrators and other driving adapters | All but reading configuration |
 | Driven adapter | `src/Adapters/Driven/` | The core, ports and other driven adapters | All but reading configuration |
 | Entrypoint | `bin/` and `public/` | Anything | All |
 
-Tests may do anything. A file under `src/Adapters/` in neither `Driving/` nor `Driven/` is an orchestrator, so the effects it performs are reported.
+Tests may do anything. A class under `src/` in none of these directories has no role: deptrac puts it in an Unplaced layer, which may depend on nothing and which nothing may depend on, and PHPStan reports the effects it performs. A stray class that neither depends on nor is used by a class in a role isn't caught yet.
 
 A driving adapter, such as a controller or a console command, calls an orchestrator directly; it imports no port and no driven adapter. An entrypoint constructs the adapters and orchestrators and starts a driving adapter.
 
-A dependency of mine, in `IanFlanagan\<Project>\`, takes its roles from its namespace: `\Core\`, `\Ports\`, `\Adapters\Driving\` and `\Adapters\Driven\` give those roles, and everything else but `\Tests\` is an orchestrator. The root-namespace rule maps a project's namespace to `src/`, so the namespace and the directory give a class the same role. A project's core can then use a library's core, and its driven adapters implement a library's ports, while its core calling a library's orchestrators is reported. Other vendors' classes are in no layer.
+A dependency of mine, in `IanFlanagan\<Project>\`, takes its roles from its namespace: `\Core\`, `\Ports\`, `\Orchestrators\`, `\Adapters\Driving\` and `\Adapters\Driven\` give those roles, and anything else but `\Tests\` is Unplaced. The root-namespace rule maps a project's namespace to `src/`, so the namespace and the directory give a class the same role. A project's core can then use a library's core, and its driven adapters implement a library's ports, while its core calling a library's orchestrators is reported. Other vendors' classes are in no layer.
 
 A port is an interface in `src/Ports/`, named for what the domain needs from it (`Orders`, `Clock`), not for the vendor or technology behind it (`MysqlOrders`, `RedisCache`). Nothing checks the naming. Ports have their own directory, rather than living beside the orchestrator that calls them as in Go, because a PHP driven adapter has to name the interface it implements, and driven adapters may not import orchestrators.
 

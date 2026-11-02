@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use App\Greeter;
+use App\Orchestrators\Greeter;
 
 final class ImportsOrchestrator
 {

@@ -27,9 +27,11 @@ final class ConformanceTest extends TestCase
         $this->assertSame([], self::layerViolations('src/Ports/Clock.php'));
         $this->assertSame([], self::layerViolations('src/Adapters/Driven/SystemClock.php'));
         $this->assertSame([], self::layerViolations('src/Adapters/Driving/Server.php'));
-        $this->assertSame([], self::layerViolations('src/Greeter.php'));
+        $this->assertSame([], self::layerViolations('src/Orchestrators/Greeter.php'));
         $this->assertSame([], self::layerViolations('bin/app.php'));
         $this->assertSame(['disallowed.function'], self::phpstanErrors('src/Adapters/Unplaced.php'));
+        $this->assertSame(['Unplaced -> Core'], self::layerViolations('src/App/Stray.php'));
+        $this->assertSame(['Orchestrator -> Unplaced'], self::layerViolations('src/Orchestrators/UsesStray.php'));
     }
 
     public function test_a_dependency_of_mine_has_the_roles_its_namespace_gives(): void
@@ -88,7 +90,7 @@ final class ConformanceTest extends TestCase
     {
         $this->assertEffectsAreReported('src/Orchestrators');
         $this->assertSame(['phpBaseline.staticState'], self::phpstanErrors('src/Orchestrators/StaticVariable.php'));
-        $this->assertSame([], self::phpstanErrors('src/Greeter.php'));
+        $this->assertSame([], self::phpstanErrors('src/Orchestrators/Greeter.php'));
     }
 
     public function test_only_entrypoints_read_configuration(): void

@@ -3,12 +3,13 @@
 # it implements: orchestrators and driven adapters may both import a port, and a port only the
 # core. Driving adapters call orchestrators directly, and import no port. bin/ and public/, the
 # entrypoints, are in no layer, so they may use anything; a script is not a class, so nothing
-# can import one. A file under src/Adapters/ in neither Driving/ nor Driven/ is an orchestrator.
+# can import one. Orchestrators are under src/Orchestrators/. A class under src/ in none of the
+# roles' directories is Unplaced: it may depend on nothing, and nothing may depend on it.
 # Directories are from the directory deptrac runs in, which must be the project's root.
 #
 # A dependency of mine (IanFlanagan\<Project>\...) takes its role from its namespace, which the
-# root-namespace rule ties to its directory: \Core\, \Ports\, \Adapters\Driving\ and
-# \Adapters\Driven\ give those roles, and everything else outside \Tests\ is an orchestrator. So
+# root-namespace rule ties to its directory: \Core\, \Ports\, \Orchestrators\,
+# \Adapters\Driving\ and \Adapters\Driven\ give those roles. So
 # a project's core may use a library's core, and its driven adapters may implement a library's
 # ports, but its core can't call a library's orchestrators.
 deptrac:
@@ -39,24 +40,26 @@ deptrac:
           value: '#^IanFlanagan\\[A-Za-z0-9]+\\Adapters\\Driven\\#'
     - name: Orchestrator
       collectors:
+        - type: directory
+          value: ^%projectDirectory%/src/Orchestrators/.*
+        - type: classNameRegex
+          value: '#^IanFlanagan\\[A-Za-z0-9]+\\Orchestrators\\#'
+    - name: Unplaced
+      collectors:
         - type: bool
           must:
             - type: directory
               value: ^%projectDirectory%/src/.*
           must_not:
             - type: directory
-              value: ^%projectDirectory%/src/Core/.*
-            - type: directory
-              value: ^%projectDirectory%/src/Ports/.*
-            - type: directory
-              value: ^%projectDirectory%/src/Adapters/(Driving|Driven)/.*
+              value: ^%projectDirectory%/src/(Core|Ports|Orchestrators|Adapters/Driving|Adapters/Driven)/.*
         - type: bool
           must:
             - type: classNameRegex
               value: '#^IanFlanagan\\[A-Za-z0-9]+\\#'
           must_not:
             - type: classNameRegex
-              value: '#^IanFlanagan\\[A-Za-z0-9]+\\(Core|Ports|Adapters\\Driving|Adapters\\Driven|Tests)\\#'
+              value: '#^IanFlanagan\\[A-Za-z0-9]+\\(Core|Ports|Orchestrators|Adapters\\Driving|Adapters\\Driven|Tests)\\#'
   ruleset:
     Core: ~
     Port:
@@ -70,3 +73,4 @@ deptrac:
     DrivenAdapter:
       - Core
       - Port
+    Unplaced: ~

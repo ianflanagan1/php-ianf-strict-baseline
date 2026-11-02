@@ -30,7 +30,7 @@ final class RulebookListing
             'roles' => [
                 'core' => 'Files under src/Core/, and classes of my dependencies in a \\Core\\ namespace.',
                 'port' => 'Files under src/Ports/, and classes of my dependencies in a \\Ports\\ namespace.',
-                'orchestrator' => 'Every other file under src/, and every other class of my dependencies but tests.',
+                'orchestrator' => 'Files under src/Orchestrators/, and classes of my dependencies in an \\Orchestrators\\ namespace.',
                 'driving-adapter' => 'Files under src/Adapters/Driving/, and classes of my dependencies in an \\Adapters\\Driving\\ namespace.',
                 'driven-adapter' => 'Files under src/Adapters/Driven/, and classes of my dependencies in an \\Adapters\\Driven\\ namespace.',
                 'entrypoint' => 'Scripts in bin/ and public/.',
@@ -39,7 +39,7 @@ final class RulebookListing
                 'deptrac-layers' => [
                     'kind' => 'tool',
                     'tool' => 'deptrac',
-                    'summary' => 'Layers by directory: src/Core/ is the core, src/Ports/ the ports, src/Adapters/Driving/ and src/Adapters/Driven/ the two kinds of adapter, and the rest of src/ the orchestrators. A dependency of mine, in IanFlanagan\\<Project>\\, is layered by the same names in its namespace. The core depends on nothing else, ports only on the core, orchestrators and driven adapters only on the core and ports, and driving adapters only on the core and orchestrators.',
+                    'summary' => 'Layers by directory: src/Core/ is the core, src/Ports/ the ports, src/Orchestrators/ the orchestrators, and src/Adapters/Driving/ and src/Adapters/Driven/ the two kinds of adapter. Any other class under src/ is Unplaced, which may depend on nothing and which nothing may depend on. A dependency of mine, in IanFlanagan\\<Project>\\, is layered by the same names in its namespace. The core depends on nothing else, ports only on the core, orchestrators and driven adapters only on the core and ports, and driving adapters only on the core and orchestrators.',
                 ],
                 'scripts-unimportable' => [
                     'kind' => 'language',
@@ -69,7 +69,7 @@ final class RulebookListing
                 'no-discard' => self::phpstan('PHPStan reports a call to a function or method marked #[\\NoDiscard] whose result is dropped.'),
             ],
             'clauses' => [
-                'every-unit-has-one-role' => self::full(['deptrac-layers'], 'test_every_unit_has_one_role') + ['note' => 'A file under src/Adapters/ in neither Driving/ nor Driven/ is an orchestrator, so the effects it performs are reported.'],
+                'every-unit-has-one-role' => self::partial(['deptrac-layers'], "A class under src/ in none of the roles' directories is reported only when it depends on a class in a layer, or one depends on it; one that does neither passes.", 'test_every_unit_has_one_role'),
                 'dependency-units-keep-their-role' => self::partial(['deptrac-layers'], 'Only a dependency of mine, in IanFlanagan\\<Project>\\, has roles: any other library is in no layer, so any role may use it.', 'test_a_dependency_of_mine_has_the_roles_its_namespace_gives'),
                 'applications-are-never-dependencies' => self::none(),
                 'library-adapters-use-only-the-standard-library' => self::noneBecause('deptrac leaves out classes in no layer, so an adapter can use any library.'),
