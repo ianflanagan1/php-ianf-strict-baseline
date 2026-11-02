@@ -110,15 +110,18 @@ PHPStan analyses only `.php` files in a directory it's given, so list each scrip
 
 ## The code rulebook
 
-`src/Core/RulebookListing.php` records which checks enforce each of the rulebook's clauses and the tests that prove it. `rulebook-coverage.json` holds that listing. A test fails when the file is out of date or names a test that doesn't exist.
+`src/Core/RulebookListing.php` records which checks enforce each of the rulebook's clauses and the tests that prove it. `rulebook-coverage.json` holds that listing. A test fails when the file is out of date or names a test that doesn't exist. The `rulebook` task, which `check` runs, checks the listing with `check-listing` from the code-rulebook release `RULEBOOK_RELEASE` pins: it fails on a clause that applies to PHP and isn't assessed, a role that isn't mapped, or a claim of full or partial coverage without proof. It runs through Go, which devbox pins for that alone.
+
+code-rulebook is a private repository, so the task needs Git access to it. Locally, have Git fetch it over SSH: `git config --global url."git@github.com:ianflanagan1/code-rulebook".insteadOf "https://github.com/ianflanagan1/code-rulebook"`. In CI, give the job a token that can read it.
 
 `tests/ConformanceTest.php` is the proof. It runs deptrac and PHPStan, with the shipped configs, over `tests/fixtures/conformance`, which has a file for each violation the rulebook describes. Each test is named for its clause. One test pins down a gap the listing records, that only `#[\NoDiscard]` functions are checked, so closing the gap fails it until the listing changes too.
 
 When a check changes what it enforces, or the baseline moves to a new rulebook release:
 
-1. Assess each clause the new release changed. Where an existing check reaches, add the violation to `tests/fixtures/conformance` and a test named for its clause. Where catching it needs a check the baseline doesn't have, such as a new PHPStan rule, record the coverage the existing checks give and write down what the missing check must do; it is built separately.
-2. Update the claim in `src/Core/RulebookListing.php`.
-3. `devbox run -- task rulebook-coverage`, then `check`.
+1. Bump `RULEBOOK_RELEASE` in `Taskfile.yml`, if moving.
+2. Assess each clause the `rulebook` task reports. Where an existing check reaches, add the violation to `tests/fixtures/conformance` and a test named for its clause. Where catching it needs a check the baseline doesn't have, such as a new PHPStan rule, record the coverage the existing checks give and write down what the missing check must do; it is built separately.
+3. Update the claim in `src/Core/RulebookListing.php`.
+4. `devbox run -- task rulebook-coverage`, then `check`.
 
 ## Development
 
@@ -126,7 +129,7 @@ PHP and Composer come from the project's devbox, so neither needs installing.
 
 ```sh
 devbox run -- task setup
-devbox run -- task check   # composer.json, the tests (including the conformance tests), PHPStan, deptrac and Pint
+devbox run -- task check   # composer.json, the tests (including the conformance tests), PHPStan, deptrac, Pint and the rulebook listing
 ```
 
 The package follows the rules it ships: `src/Core/` is pure, `src/PhpStan/` holds the PHPStan rules, and `bin/php-baseline` is the entrypoint. Its own `pint.json` extends `config/pint.json`, as a project's does.

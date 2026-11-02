@@ -7,13 +7,14 @@ tasks:
       - 'composer install --no-interaction'
 
   check:
-    desc: composer.json, the tests (which include the conformance tests), PHPStan, deptrac and Pint
+    desc: composer.json, the tests (which include the conformance tests), PHPStan, deptrac, Pint and the rulebook listing
     cmds:
       - 'composer validate --strict'
       - 'vendor/bin/phpunit --colors=never'
       - 'vendor/bin/phpstan analyse --no-progress'
       - 'vendor/bin/deptrac analyse --no-progress'
       - 'vendor/bin/pint --test'
+      - task: rulebook
 
   format:
     desc: Format every file
@@ -31,3 +32,15 @@ tasks:
     desc: Write rulebook-coverage.json, how php-baseline enforces the code rulebook
     cmds:
       - 'php bin/php-baseline rulebook > rulebook-coverage.json'
+
+  rulebook:
+    desc: Check rulebook-coverage.json against the release of the code rulebook it is assessed for
+    vars:
+      # Moving to a new release means assessing what it changed.
+      RULEBOOK_RELEASE: v0.1.0
+    env:
+      # code-rulebook is private; Git needs access to it, as the README says.
+      GOPRIVATE: github.com/ianflanagan1/code-rulebook
+      GOTOOLCHAIN: local
+    cmds:
+      - 'go run github.com/ianflanagan1/code-rulebook/cmd/code-rulebook@{{.RULEBOOK_RELEASE}} check-listing'
