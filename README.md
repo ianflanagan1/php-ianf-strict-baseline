@@ -28,19 +28,6 @@ A driving adapter, such as a controller or a console command, calls an orchestra
 
 A dependency of mine, in `IanFlanagan\<Project>\`, takes its roles from its namespace: `\Core\`, `\Ports\`, `\Adapters\Driving\` and `\Adapters\Driven\` give those roles, and everything else but `\Tests\` is an orchestrator. The root-namespace rule maps a project's namespace to `src/`, so the namespace and the directory give a class the same role. A project's core can then use a library's core, and its driven adapters implement a library's ports, while its core calling a library's orchestrators is reported. Other vendors' classes are in no layer.
 
-## Kinds
-
-The code rulebook's project kinds use the same layout:
-
-| Kind | Has |
-|---|---|
-| Application | Every role |
-| Pure library | Only `src/Core/`. The default for a library. |
-| Library | Core, ports, orchestrators and adapters, but no entrypoint, for when every user would otherwise write the same orchestrators. Its orchestrators take driven adapters through its ports and never build them; its adapters use only PHP's standard library. |
-| Adapter library | Only `src/Adapters/Driving/` and `src/Adapters/Driven/` |
-
-Nothing checks a project's kind yet.
-
 A port is an interface in `src/Ports/`, named for what the domain needs from it (`Orders`, `Clock`), not for the vendor or technology behind it (`MysqlOrders`, `RedisCache`). Nothing checks the naming. Ports have their own directory, rather than living beside the orchestrator that calls them as in Go, because a PHP driven adapter has to name the interface it implements, and driven adapters may not import orchestrators.
 
 The effects are the rulebook's: the clock, randomness, the filesystem, the network (including databases and the request superglobals), processes (including `exit`), the console (including `echo`), global logging, configuration (`getenv()`, `$_ENV`, `$_SERVER`) and global state (`global`, `$GLOBALS`). `new DateTimeImmutable()` reads the clock, so the core parses dates with `DateTimeImmutable::createFromFormat()` and takes the current time as a value.
@@ -104,7 +91,7 @@ PHPStan analyses only `.php` files in a directory it's given, so list each scrip
 
 - Libraries: deptrac leaves out classes in no layer, so the core and orchestrators can use any library, including one that does I/O.
 - The bans list the common functions for each effect, not every one.
-- A project's kind, and the rules go-baseline's analyzers enforce: the core takes values rather than ports, and orchestrators branch only on what the core returns.
+- The rules go-baseline's analyzers enforce: the core takes values rather than ports, and orchestrators branch only on what the core returns.
 - A family without a `@phpstan-sealed` tag isn't known to be closed, and only functions marked `#[\NoDiscard]` have their results checked.
 - There is no `verify` yet, to check that a project includes these configs, runs Pint in its `check` and doesn't weaken them, or that `phpstan.neon` lists every script in `bin/` without an extension.
 
