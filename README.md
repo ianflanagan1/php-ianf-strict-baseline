@@ -87,7 +87,7 @@ PHPStan analyses only `.php` files in a directory it's given, so list each scrip
 
 ## What it doesn't check yet
 
-[The rulebook's coverage table](https://github.com/ianflanagan1/code-rulebook/blob/main/COVERAGE.md) has the full list. The main gaps:
+[The rulebook's coverage table](https://github.com/ianflanagan1/code-rulebook/blob/main/rulebook/setups/ianf-strict/COVERAGE.md) has the full list. The main gaps:
 
 - Libraries: deptrac leaves out classes in no layer, so the core and orchestrators can use any library, including one that does I/O.
 - The bans list the common functions for each effect, not every one.
