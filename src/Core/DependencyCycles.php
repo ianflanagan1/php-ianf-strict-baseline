@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\Core;
+namespace IanFlanagan\PhpIanfStrictBaseline\Core;
 
 /**
  * Finds the cycles in a dependency graph: each set of units that depend on each other, directly

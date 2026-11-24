@@ -2,11 +2,11 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
-         cacheDirectory=".phpunit.cache"
+         cacheDirectory="cache/phpunit"
          failOnWarning="true"
          failOnRisky="true">
     <testsuites>
-        <testsuite name="php-baseline">
+        <testsuite name="php-ianf-strict-baseline">
             <directory>tests</directory>
             <exclude>tests/fixtures</exclude>
         </testsuite>

@@ -3,16 +3,27 @@
 # it implements: orchestrators and driven adapters may both import a port, and a port only the
 # core. Driving adapters call orchestrators directly, and import no port. bin/ and public/, the
 # entrypoints, are in no layer, so they may use anything; a script is not a class, so nothing
-# can import one. Orchestrators are under src/Orchestrators/. A class under src/ in none of the
-# roles' directories is Unplaced: it may depend on nothing, and nothing may depend on it.
+# can import one. Orchestrators are under src/Orchestrators/.
+#
+# Two layers hold code that no program runs and that a project ships so the tests of projects
+# that require it can load it. Fakes, under src/Fakes/, may depend on the core and ports.
+# Shipped test code, under src/Testing/, such as an assertion or a port's contract tests, may
+# depend on the core, ports and fakes. No role's layer may depend on either. tests/ is not read.
+#
+# A class under src/ in none of these directories is Unplaced: it may depend on nothing, and
+# nothing may depend on it.
 # Directories are from the directory deptrac runs in, which must be the project's root.
 #
 # A dependency of mine (IanFlanagan\<Project>\...) takes its role from its namespace, which the
 # root-namespace rule ties to its directory: \Core\, \Ports\, \Orchestrators\,
-# \Adapters\Driving\ and \Adapters\Driven\ give those roles. So
+# \Adapters\Driving\, \Adapters\Driven\, \Fakes\ and \Testing\ give those layers. So
 # a project's core may use a library's core, and its driven adapters may implement a library's
 # ports, but its core can't call a library's orchestrators.
 deptrac:
+  # The project's tools keep their caches under cache/, which php-ianf-strict-baseline verify checks
+  # .gitignore ignores. deptrac doesn't expand %projectDirectory% here, so the path is from the
+  # directory deptrac runs in, the project's root.
+  cache_file: cache/deptrac/deptrac.cache
   layers:
     - name: Core
       collectors:
@@ -44,6 +55,18 @@ deptrac:
           value: ^%projectDirectory%/src/Orchestrators/.*
         - type: classNameRegex
           value: '#^IanFlanagan\\[A-Za-z0-9]+\\Orchestrators\\#'
+    - name: Fake
+      collectors:
+        - type: directory
+          value: ^%projectDirectory%/src/Fakes/.*
+        - type: classNameRegex
+          value: '#^IanFlanagan\\[A-Za-z0-9]+\\Fakes\\#'
+    - name: Testing
+      collectors:
+        - type: directory
+          value: ^%projectDirectory%/src/Testing/.*
+        - type: classNameRegex
+          value: '#^IanFlanagan\\[A-Za-z0-9]+\\Testing\\#'
     - name: Unplaced
       collectors:
         - type: bool
@@ -52,14 +75,14 @@ deptrac:
               value: ^%projectDirectory%/src/.*
           must_not:
             - type: directory
-              value: ^%projectDirectory%/src/(Core|Ports|Orchestrators|Adapters/Driving|Adapters/Driven)/.*
+              value: ^%projectDirectory%/src/(Core|Ports|Orchestrators|Adapters/Driving|Adapters/Driven|Fakes|Testing)/.*
         - type: bool
           must:
             - type: classNameRegex
               value: '#^IanFlanagan\\[A-Za-z0-9]+\\#'
           must_not:
             - type: classNameRegex
-              value: '#^IanFlanagan\\[A-Za-z0-9]+\\(Core|Ports|Orchestrators|Adapters\\Driving|Adapters\\Driven|Tests)\\#'
+              value: '#^IanFlanagan\\[A-Za-z0-9]+\\(Core|Ports|Orchestrators|Adapters\\Driving|Adapters\\Driven|Fakes|Testing|Tests)\\#'
   ruleset:
     Core: ~
     Port:
@@ -73,4 +96,11 @@ deptrac:
     DrivenAdapter:
       - Core
       - Port
+    Fake:
+      - Core
+      - Port
+    Testing:
+      - Core
+      - Port
+      - Fake
     Unplaced: ~

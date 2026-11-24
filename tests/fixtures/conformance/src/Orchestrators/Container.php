@@ -8,8 +8,8 @@ use Psr\Container\ContainerInterface;
 
 final class Container
 {
-    public function greeter(ContainerInterface $c): mixed
+    public function hasGreeter(ContainerInterface $c): bool
     {
-        return $c->get('greeter');
+        return $c->has('greeter');
     }
 }

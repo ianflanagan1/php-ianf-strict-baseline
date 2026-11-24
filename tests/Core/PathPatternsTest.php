@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\Tests\Core;
+namespace IanFlanagan\PhpIanfStrictBaseline\Tests\Core;
 
-use IanFlanagan\PhpBaseline\Core\PathPatterns;
+use IanFlanagan\PhpIanfStrictBaseline\Core\PathPatterns;
 use PHPUnit\Framework\TestCase;
 
 final class PathPatternsTest extends TestCase

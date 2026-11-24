@@ -1,5 +1,5 @@
 {
-    "name": "ianflanagan1/php-baseline",
+    "name": "ianflanagan1/php-ianf-strict-baseline",
     "description": "Shared PHP architecture checks: deptrac layers and PHPStan bans that keep a functional core, imperative shell and hexagonal architecture, with the coverage listing the code rulebook checks",
     "type": "phpstan-extension",
     "license": "MIT",
@@ -28,16 +28,16 @@
     },
     "autoload": {
         "psr-4": {
-            "IanFlanagan\\PhpBaseline\\": "src/"
+            "IanFlanagan\\PhpIanfStrictBaseline\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "IanFlanagan\\PhpBaseline\\Tests\\": "tests/"
+            "IanFlanagan\\PhpIanfStrictBaseline\\Tests\\": "tests/"
         }
     },
     "bin": [
-        "bin/php-baseline"
+        "bin/php-ianf-strict-baseline"
     ],
     "extra": {
         "phpstan": {

@@ -1,81 +1,216 @@
-# The code rulebook's rules, in PHP's terms. Every effect from the rulebook's vocabulary is banned
-# outside driving and driven adapters (src/Adapters/Driving/ and src/Adapters/Driven/), the
-# entrypoints (bin/ and public/) and tests; reading configuration is banned outside the
-# entrypoints and tests. Paths are from the directory
-# PHPStan runs in, which must be the project's root.
+# The code rulebook's rules, in PHP's terms. Each impure operation in the rulebook's vocabulary is
+# banned outside the directories of the roles that may perform it: driving adapters
+# (src/Adapters/Driving/), driven adapters (src/Adapters/Driven/) and the entrypoints (bin/ and
+# public/). Each operation has its own list of those directories below, with tests in every one.
+# Sleeping has no list: no code does it. Paths are from the directory PHPStan runs in, which must
+# be the project's root.
 #
 # Needs spaze/phpstan-disallowed-calls, which phpstan/extension-installer includes, or include its
 # extension.neon before this file.
+#
+# The bans are also the one list of impure operations: CoreCallsReachNothingImpureRule reads every
+# entry of spaze/phpstan-disallowed-calls's lists that has an allowIn list as an impure operation,
+# and follows the core's calls into code outside it to find one. An entry without an allowIn list,
+# such as the ban on assert(), is a code rule, not an impure operation. So every impure operation's
+# entry has one, sleeping's empty.
 
 parametersSchema:
-    phpBaselineEffectPaths: listOf(string())
-    phpBaselineEntrypointPaths: listOf(string())
-    phpBaselineSizeLimitedPaths: listOf(string())
-    phpBaselineAllowedParentClasses: listOf(string())
+    phpIanfStrictBaselineClockPaths: listOf(string())
+    phpIanfStrictBaselineRandomnessPaths: listOf(string())
+    phpIanfStrictBaselineFilesystemPaths: listOf(string())
+    phpIanfStrictBaselineNetworkServingPaths: listOf(string())
+    phpIanfStrictBaselineNetworkCallingPaths: listOf(string())
+    phpIanfStrictBaselineSocketPaths: listOf(string())
+    phpIanfStrictBaselineDatabasePaths: listOf(string())
+    phpIanfStrictBaselineProcessPaths: listOf(string())
+    phpIanfStrictBaselineConsolePaths: listOf(string())
+    phpIanfStrictBaselineLoggingPaths: listOf(string())
+    phpIanfStrictBaselineConfigurationPaths: listOf(string())
+    phpIanfStrictBaselineGlobalStatePaths: listOf(string())
+    phpIanfStrictBaselineCorePaths: listOf(string())
+    phpIanfStrictBaselineSizeLimitedPaths: listOf(string())
+    phpIanfStrictBaselineAllowedParentClasses: listOf(string())
 
 rules:
-    - IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\MatchDefaultArmRule
-    - IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\SwitchOnClosedFamilyRule
-    - IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\ParameterDefaultRule
-    - IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\DependencyCycleRule
+    - IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\MatchDefaultArmRule
+    - IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\SwitchOnClosedFamilyRule
+    - IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\ParameterDefaultRule
+    - IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\DependencyCycleRule
 
 services:
     -
-        class: IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\ClassDependencyCollector
+        class: IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\ClassDependencyCollector
         tags:
             - phpstan.collector
     -
-        class: IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\InheritanceRule
+        class: IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\InheritanceRule
         arguments:
-            allowedParents: %phpBaselineAllowedParentClasses%
+            allowedParents: %phpIanfStrictBaselineAllowedParentClasses%
         tags:
             - phpstan.rules.rule
     -
-        class: IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\FunctionLengthRule
+        class: IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\FunctionLengthRule
         arguments:
-            paths: %phpBaselineSizeLimitedPaths%
+            paths: %phpIanfStrictBaselineSizeLimitedPaths%
             root: %currentWorkingDirectory%
         tags:
             - phpstan.rules.rule
     -
-        class: IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\ScriptLengthRule
+        class: IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\ScriptLengthRule
         arguments:
-            paths: %phpBaselineSizeLimitedPaths%
+            paths: %phpIanfStrictBaselineSizeLimitedPaths%
             root: %currentWorkingDirectory%
         tags:
             - phpstan.rules.rule
     -
-        class: IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan\StaticStateRule
+        class: IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\StaticStateRule
         arguments:
-            effectPaths: %phpBaselineEffectPaths%
+            globalStatePaths: %phpIanfStrictBaselineGlobalStatePaths%
+            root: %currentWorkingDirectory%
+        tags:
+            - phpstan.rules.rule
+    # The impure operations, read from the bans below rather than listed a second time.
+    phpIanfStrictBaselineImpureOperations:
+        class: IanFlanagan\PhpIanfStrictBaseline\Core\Reach\ImpureOperations
+        factory: IanFlanagan\PhpIanfStrictBaseline\Core\Reach\ImpureOperations::fromDisallowedCalls(%disallowedFunctionCalls%, %disallowedMethodCalls%, %disallowedStaticCalls%, %disallowedNamespaces%, %disallowedConstants%, %disallowedSuperglobals%, %disallowedKeywords%)
+        autowired: false
+    phpIanfStrictBaselineCallSteps:
+        class: IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\CallSteps
+        arguments:
+            operations: @phpIanfStrictBaselineImpureOperations
+            corePaths: %phpIanfStrictBaselineCorePaths%
+            root: %currentWorkingDirectory%
+        autowired: false
+    phpIanfStrictBaselineCodeReach:
+        class: IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\CodeReach
+        arguments:
+            # The parser PHPStan analyses a project's own files with. Its default parser drops the
+            # bodies of functions in files it doesn't analyse, such as a package's in vendor/.
+            parser: @currentPhpVersionRichParser
+            steps: @phpIanfStrictBaselineCallSteps
+            root: %currentWorkingDirectory%
+        autowired: false
+    -
+        class: IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan\CoreCallsReachNothingImpureRule
+        arguments:
+            steps: @phpIanfStrictBaselineCallSteps
+            reach: @phpIanfStrictBaselineCodeReach
+            corePaths: %phpIanfStrictBaselineCorePaths%
             root: %currentWorkingDirectory%
         tags:
             - phpstan.rules.rule
 
 parameters:
-    # Level 4 is the lowest at which PHPStan reports a match that leaves out a case. A project may
-    # set a higher level, not a lower one.
-    level: 4
+    # PHPStan's strictest level. From level 4 it reports a match that leaves out a case, from 6 a
+    # parameter, return value or property with no type and an array with no value type, and from 9
+    # and 10 anything done with a mixed but testing it or passing it on. A project sets no lower
+    # level.
+    level: 10
+    # A method that overrides or implements another carries #[\Override], so PHPStan reports it
+    # once the method it overrides is renamed or removed.
+    checkMissingOverrideMethodAttribute: true
+    # Checked exceptions. An exception is for a failure no caller could handle, and an expected
+    # failure is a value a function returns. PHPStan reports a checked exception that a function
+    # throws, or lets escape from a call, without a @throws tag, and an implementation whose @throws
+    # tag names one that its interface's @throws tag doesn't. So a driven adapter can't let one
+    # through a port without declaring it. Every exception is checked but an Error, a
+    # LogicException, a RuntimeException, a Random\RandomException and their subclasses, which are
+    # for what no caller could handle: a bug, or infrastructure that failed, such as a lost
+    # connection or a random source that can't be read.
+    exceptions:
+        check:
+            missingCheckedExceptionInThrows: true
+            throwTypeCovariance: true
+            tooWideThrowType: true
+        uncheckedExceptionClasses:
+            - Error
+            - LogicException
+            - RuntimeException
+            - Random\RandomException
+    # The core, whose calls into code outside it CoreCallsReachNothingImpureRule follows.
+    phpIanfStrictBaselineCorePaths:
+        - src/Core/*
     # Where functions are held to 50 lines: adapters and the entrypoints.
-    phpBaselineSizeLimitedPaths:
+    phpIanfStrictBaselineSizeLimitedPaths:
         - src/Adapters/Driving/*
         - src/Adapters/Driven/*
         - bin/*
         - public/*
     # The classes a class may extend, besides PHP's own exceptions: framework base classes.
-    phpBaselineAllowedParentClasses:
+    phpIanfStrictBaselineAllowedParentClasses:
         - PHPUnit\Framework\TestCase
-    # Where effects are allowed: adapters, the entrypoints and tests.
-    phpBaselineEffectPaths:
+    # Where each impure operation is allowed, following each role's may-perform-impure-operations
+    # in the rulebook's vocabulary. A project with other directories for a role sets each list that
+    # names the role's directory.
+    #
+    # The clock and randomness: reserved for system adapters, which PHP's shared code will
+    # hold. Until they exist a project's own driven adapter is the only way to reach either, and
+    # nothing tells that adapter from other adapter and entrypoint code, so all of it is allowed.
+    phpIanfStrictBaselineClockPaths:
         - src/Adapters/Driving/*
         - src/Adapters/Driven/*
         - bin/*
         - public/*
         - tests/*
-    # Where configuration may be read: the entrypoints and tests.
-    phpBaselineEntrypointPaths:
+    phpIanfStrictBaselineRandomnessPaths:
+        - src/Adapters/Driving/*
+        - src/Adapters/Driven/*
         - bin/*
         - public/*
+        - tests/*
+    # Files: both adapters and the entrypoints.
+    phpIanfStrictBaselineFilesystemPaths:
+        - src/Adapters/Driving/*
+        - src/Adapters/Driven/*
+        - bin/*
+        - public/*
+        - tests/*
+    # Serving requests: driving adapters.
+    phpIanfStrictBaselineNetworkServingPaths:
+        - src/Adapters/Driving/*
+        - tests/*
+    # Network calls: driven adapters.
+    phpIanfStrictBaselineNetworkCallingPaths:
+        - src/Adapters/Driven/*
+        - tests/*
+    # Reading and writing a socket, which serving and calling both do: both adapters. The calls
+    # that open one, and so give it a direction, are in the two lists above.
+    phpIanfStrictBaselineSocketPaths:
+        - src/Adapters/Driving/*
+        - src/Adapters/Driven/*
+        - tests/*
+    # Databases: driven adapters.
+    phpIanfStrictBaselineDatabasePaths:
+        - src/Adapters/Driven/*
+        - tests/*
+    # Processes: both adapters and the entrypoints.
+    phpIanfStrictBaselineProcessPaths:
+        - src/Adapters/Driving/*
+        - src/Adapters/Driven/*
+        - bin/*
+        - public/*
+        - tests/*
+    # The console: both adapters and the entrypoints.
+    phpIanfStrictBaselineConsolePaths:
+        - src/Adapters/Driving/*
+        - src/Adapters/Driven/*
+        - bin/*
+        - public/*
+        - tests/*
+    # Global logging: both adapters and the entrypoints.
+    phpIanfStrictBaselineLoggingPaths:
+        - src/Adapters/Driving/*
+        - src/Adapters/Driven/*
+        - bin/*
+        - public/*
+        - tests/*
+    # Reading configuration: the entrypoints.
+    phpIanfStrictBaselineConfigurationPaths:
+        - bin/*
+        - public/*
+        - tests/*
+    # Global state: no role's code.
+    phpIanfStrictBaselineGlobalStatePaths:
         - tests/*
     disallowedFunctionCalls:
         -
@@ -90,12 +225,17 @@ parameters:
                 - 'strtotime()'
                 - 'date_create()'
                 - 'date_create_immutable()'
+            message: 'reads the clock; the core takes the time as a value, and an orchestrator asks a clock port'
+            allowIn: %phpIanfStrictBaselineClockPaths%
+        -
+            function:
                 - 'sleep()'
                 - 'usleep()'
                 - 'time_nanosleep()'
                 - 'time_sleep_until()'
-            message: 'reads the clock; the core takes the time as a value, and an orchestrator asks a clock port'
-            allowIn: %phpBaselineEffectPaths%
+            message: 'sleeps, which no code does, a test included; fail the work back to whatever can wait, such as a queue that redelivers the message later'
+            # Empty: no code may sleep. It is an impure operation, so it has the list.
+            allowIn: []
         -
             function:
                 - 'rand()'
@@ -110,7 +250,7 @@ parameters:
                 - 'str_shuffle()'
                 - 'array_rand()'
             message: 'is random; take the value from a port'
-            allowIn: %phpBaselineEffectPaths%
+            allowIn: %phpIanfStrictBaselineRandomnessPaths%
         -
             function:
                 - 'fopen()'
@@ -141,21 +281,55 @@ parameters:
                 - 'filemtime()'
                 - 'realpath()'
             message: 'touches the filesystem; reach files through a port'
-            allowIn: %phpBaselineEffectPaths%
+            allowIn: %phpIanfStrictBaselineFilesystemPaths%
         -
             function:
                 - 'curl_*()'
                 - 'fsockopen()'
                 - 'pfsockopen()'
-                - 'stream_socket_*()'
-                - 'socket_*()'
+                - 'stream_socket_client()'
+                - 'socket_connect()'
                 - 'gethostbyname()'
                 - 'dns_get_record()'
                 - 'mail()'
+            message: 'calls out over the network, which only a driven adapter does; reach it through a port'
+            allowIn: %phpIanfStrictBaselineNetworkCallingPaths%
+        -
+            function:
+                - 'stream_socket_server()'
+                - 'stream_socket_accept()'
+                - 'socket_create_listen()'
+                - 'socket_bind()'
+                - 'socket_listen()'
+                - 'socket_accept()'
                 - 'header()'
                 - 'setcookie()'
-            message: 'uses the network; reach it through a port'
-            allowIn: %phpBaselineEffectPaths%
+            message: 'serves a request, which only a driving adapter does; an entrypoint starts the driving adapter, and a driven adapter is called through a port'
+            allowIn: %phpIanfStrictBaselineNetworkServingPaths%
+        -
+            function:
+                - 'stream_socket_*()'
+                - 'socket_*()'
+            exclude:
+                - 'stream_socket_client()'
+                - 'stream_socket_server()'
+                - 'stream_socket_accept()'
+                - 'socket_connect()'
+                - 'socket_create_listen()'
+                - 'socket_bind()'
+                - 'socket_listen()'
+                - 'socket_accept()'
+            message: 'uses the network, which only an adapter does; reach it through a port'
+            allowIn: %phpIanfStrictBaselineSocketPaths%
+        -
+            function:
+                - 'mysqli_*()'
+                - 'pg_*()'
+            exclude:
+                - 'mysqli_fetch_object()'
+                - 'pg_fetch_object()'
+            message: 'reaches a database, which only a driven adapter does; reach it through a port'
+            allowIn: %phpIanfStrictBaselineDatabasePaths%
         -
             function:
                 - 'exec()'
@@ -169,7 +343,7 @@ parameters:
                 - 'exit()'
                 - 'die()'
             message: 'controls a process; do it through a port'
-            allowIn: %phpBaselineEffectPaths%
+            allowIn: %phpIanfStrictBaselineProcessPaths%
         -
             function:
                 - 'echo()'
@@ -180,14 +354,14 @@ parameters:
                 - 'var_dump()'
                 - 'readline()'
             message: 'uses the console; write through a port'
-            allowIn: %phpBaselineEffectPaths%
+            allowIn: %phpIanfStrictBaselineConsolePaths%
         -
             function:
                 - 'error_log()'
                 - 'syslog()'
                 - 'openlog()'
             message: 'logs globally; take a logger through a port'
-            allowIn: %phpBaselineEffectPaths%
+            allowIn: %phpIanfStrictBaselineLoggingPaths%
         -
             function:
                 - 'getenv()'
@@ -195,14 +369,88 @@ parameters:
                 - 'ini_get()'
                 - 'ini_set()'
             message: 'reads configuration, which only an entrypoint does; pass the value in'
-            allowIn: %phpBaselineEntrypointPaths%
+            allowIn: %phpIanfStrictBaselineConfigurationPaths%
+        -
+            function: 'eval()'
+            message: 'runs code built as text; write the code, and choose between its branches with a value'
+        -
+            function:
+                - 'call_user_func()'
+                - 'call_user_func_array()'
+            message: 'calls by a name held in a value; call the function by name, or pass a first-class callable such as trim(...) and call that'
+        -
+            function: 'assert()'
+            message: 'narrows a type with a test production builds skip; test the value with instanceof or an is_*() function and handle its not having the type'
+        -
+            function: 'get_mangled_object_vars()'
+            message: 'reads properties their visibility hides; read them through the methods their class declares'
+        -
+            function:
+                - 'mysqli_fetch_object()'
+                - 'pg_fetch_object()'
+            message: 'has the database driver build an object without its factory method; fetch the row as an array and pass its values to the factory method'
+        -
+            function: 'unserialize()'
+            message: 'builds whatever classes the data names, without their factory methods; pass [''allowed_classes'' => false], or decode JSON and pass its values to a factory method'
+            allowParamsAnywhere:
+                -
+                    position: 2
+                    name: 'options'
+                    typeString: 'array{allowed_classes: false}'
+        -
+            function:
+                - 'array_walk()'
+                - 'array_walk_recursive()'
+                - 'iterator_apply()'
+            message: 'runs a function for each element only for its effect; use a foreach loop'
     disallowedMethodCalls:
         -
             method:
                 - 'DateTime::__construct()'
                 - 'DateTimeImmutable::__construct()'
             message: 'may read the clock; parse with createFromFormat(), or take the time from a clock port'
-            allowIn: %phpBaselineEffectPaths%
+            allowIn: %phpIanfStrictBaselineClockPaths%
+        -
+            method:
+                - 'PHPUnit\Framework\TestCase::createMock*()'
+                - 'PHPUnit\Framework\TestCase::createStub*()'
+                - 'PHPUnit\Framework\TestCase::createConfiguredMock()'
+                - 'PHPUnit\Framework\TestCase::createConfiguredStub()'
+                - 'PHPUnit\Framework\TestCase::createPartialMock()'
+                - 'PHPUnit\Framework\TestCase::getMockBuilder()'
+            message: 'builds a scripted double; write the port''s fake by hand, once, and set its state'
+        -
+            method:
+                - 'Closure::bindTo()'
+                - 'Closure::call()'
+            message: 'binds a closure to a class to reach what its visibility hides; call the methods the class declares'
+        # Every method, the constructor among them, so that one built by ReflectionClass::getProperty()
+        # or getMethod() is reported where it is used.
+        -
+            method:
+                - 'ReflectionProperty::*()'
+                - 'ReflectionMethod::*()'
+            message: 'reaches a property or a method through reflection, past its visibility; call the methods the class declares'
+        -
+            method:
+                - 'ReflectionClass::newInstanceWithoutConstructor()'
+                - 'ReflectionClass::newLazyGhost()'
+                - 'ReflectionClass::newLazyProxy()'
+            message: 'builds an object without its constructor; call the class''s factory method'
+        -
+            method:
+                - 'PDOStatement::fetchObject()'
+                - 'mysqli_result::fetch_object()'
+            message: 'has the database driver build an object without its factory method; fetch the row as an array and pass its values to the factory method'
+    disallowedStaticCalls:
+        -
+            method:
+                - 'PHPUnit\Framework\TestCase::createStub*()'
+                - 'PHPUnit\Framework\TestCase::createConfiguredStub()'
+            message: 'builds a scripted double; write the port''s fake by hand, once, and set its state'
+        -
+            method: 'Closure::bind()'
+            message: 'binds a closure to a class to reach what its visibility hides; call the methods the class declares'
     disallowedNamespaces:
         -
             namespace:
@@ -218,13 +466,26 @@ parameters:
             message: 'is a dependency-injection container; construct each adapter and orchestrator in the entrypoint and pass it in'
         -
             namespace:
+                - 'Mockery'
+                - 'Mockery\*'
+                - 'Prophecy\*'
+            message: 'is a mocking library; write the port''s fake by hand, once, and set its state'
+        -
+            namespace:
                 - 'PDO'
                 - 'PDO\*'
+                - 'PDOStatement'
                 - 'mysqli'
                 - 'mysqli_*'
+                - 'SQLite3'
+                - 'SQLite3*'
+            message: 'reaches a database, which only a driven adapter does; reach it through a port'
+            allowIn: %phpIanfStrictBaselineDatabasePaths%
+        -
+            namespace:
                 - 'SoapClient'
-            message: 'uses the network; reach it through a port'
-            allowIn: %phpBaselineEffectPaths%
+            message: 'calls out over the network, which only a driven adapter does; reach it through a port'
+            allowIn: %phpIanfStrictBaselineNetworkCallingPaths%
         -
             namespace:
                 - 'SplFileObject'
@@ -234,12 +495,12 @@ parameters:
                 - 'FilesystemIterator'
                 - 'RecursiveDirectoryIterator'
             message: 'touches the filesystem; reach files through a port'
-            allowIn: %phpBaselineEffectPaths%
+            allowIn: %phpIanfStrictBaselineFilesystemPaths%
         -
             namespace:
                 - 'Random\*'
             message: 'is random; take the value from a port'
-            allowIn: %phpBaselineEffectPaths%
+            allowIn: %phpIanfStrictBaselineRandomnessPaths%
     disallowedConstants:
         -
             constant:
@@ -247,7 +508,13 @@ parameters:
                 - 'STDOUT'
                 - 'STDERR'
             message: 'uses the console; write through a port'
-            allowIn: %phpBaselineEffectPaths%
+            allowIn: %phpIanfStrictBaselineConsolePaths%
+        -
+            class: 'PDO'
+            constant:
+                - 'FETCH_CLASS'
+                - 'FETCH_INTO'
+            message: 'has PDO set an object''s properties without its factory method; fetch the row as an array and pass its values to the factory method'
     disallowedSuperglobals:
         -
             superglobal:
@@ -257,21 +524,21 @@ parameters:
                 - '$_FILES'
                 - '$_REQUEST'
                 - '$_SESSION'
-            message: 'reads the request, which an inbound adapter translates; pass the values in'
-            allowIn: %phpBaselineEffectPaths%
+            message: 'reads the request, which only a driving adapter does; pass the values in'
+            allowIn: %phpIanfStrictBaselineNetworkServingPaths%
         -
             superglobal:
                 - '$_ENV'
                 - '$_SERVER'
             message: 'reads configuration, which only an entrypoint does; pass the value in'
-            allowIn: %phpBaselineEntrypointPaths%
+            allowIn: %phpIanfStrictBaselineConfigurationPaths%
         -
             superglobal:
                 - '$GLOBALS'
-            message: 'is global state; pass state in'
-            allowIn: %phpBaselineEffectPaths%
+            message: 'is global state, which no code keeps; pass state in'
+            allowIn: %phpIanfStrictBaselineGlobalStatePaths%
     disallowedKeywords:
         -
             keyword: 'global'
-            message: 'is global state; pass state in'
-            allowIn: %phpBaselineEffectPaths%
+            message: 'is global state, which no code keeps; pass state in'
+            allowIn: %phpIanfStrictBaselineGlobalStatePaths%

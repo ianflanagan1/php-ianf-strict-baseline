@@ -6,3 +6,9 @@ parameters:
     paths:
         - src
         - bin
+        - tests
+    # The fake third-party packages the core calls, which a project's Composer autoloader would
+    # find in its own vendor/. PHPStan reads their declarations from here and analyses none of
+    # their code.
+    scanDirectories:
+        - vendor

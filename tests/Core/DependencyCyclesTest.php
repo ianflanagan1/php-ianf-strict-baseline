@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\Tests\Core;
+namespace IanFlanagan\PhpIanfStrictBaseline\Tests\Core;
 
-use IanFlanagan\PhpBaseline\Core\DependencyCycles;
+use IanFlanagan\PhpIanfStrictBaseline\Core\DependencyCycles;
 use PHPUnit\Framework\TestCase;
 
 final class DependencyCyclesTest extends TestCase

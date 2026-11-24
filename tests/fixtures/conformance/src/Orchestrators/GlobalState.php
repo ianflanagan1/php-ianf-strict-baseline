@@ -10,6 +10,6 @@ final class GlobalState
     {
         global $count;
 
-        return ++$count;
+        return is_int($count) ? $count : 0;
     }
 }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan;
+namespace IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan;
 
-use IanFlanagan\PhpBaseline\Core\PathPatterns;
+use IanFlanagan\PhpIanfStrictBaseline\Core\PathPatterns;
 use Override;
 use PhpParser\Node;
 use PhpParser\Node\Stmt;
@@ -14,16 +14,16 @@ use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * A static property or a static variable holds state shared across calls, which is global state.
- * Only the roles that may perform effects keep any.
+ * No role's code keeps any; a project's tests may.
  *
  * @implements Rule<Stmt>
  */
 final readonly class StaticStateRule implements Rule
 {
     /**
-     * @param  list<string>  $effectPaths  where effects are allowed, as fnmatch() patterns from $root
+     * @param  list<string>  $globalStatePaths  where global state is allowed, as fnmatch() patterns from $root
      */
-    public function __construct(private array $effectPaths, private string $root)
+    public function __construct(private array $globalStatePaths, private string $root)
     {
     }
 
@@ -41,7 +41,7 @@ final readonly class StaticStateRule implements Rule
             $node instanceof Stmt\Static_ => 'A static variable',
             default => null,
         };
-        if ($what === null || PathPatterns::matches($this->effectPaths, $this->root, $scope->getFile())) {
+        if ($what === null || PathPatterns::matches($this->globalStatePaths, $this->root, $scope->getFile())) {
             return [];
         }
 

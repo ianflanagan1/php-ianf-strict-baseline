@@ -6,6 +6,7 @@ namespace App\Design;
 
 final class MatchesSignature implements \JsonSerializable
 {
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         return null;

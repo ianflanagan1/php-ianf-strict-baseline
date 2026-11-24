@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan;
+namespace IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan;
 
 use Override;
 use PhpParser\Node;

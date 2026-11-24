@@ -10,6 +10,8 @@ final class StaticVariable
     {
         static $calls = 0;
 
-        return ++$calls;
+        $calls = is_int($calls) ? $calls + 1 : 1;
+
+        return $calls;
     }
 }

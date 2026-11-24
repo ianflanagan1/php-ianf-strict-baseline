@@ -4,11 +4,12 @@ includes:
     - config/phpstan.neon
 
 parameters:
-    level: 9
-    checkMissingOverrideMethodAttribute: true
+    # PHPStan reads tmpDir only from this file and what it includes directly, not from config/phpstan.neon
+    # as extension-installer includes it in a project, so each project sets it.
+    tmpDir: cache/phpstan
     paths:
         - src
-        - bin/php-baseline
+        - bin/php-ianf-strict-baseline
         - tests
     excludePaths:
         # Breaks the rules on purpose

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan;
+namespace IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan;
 
-use IanFlanagan\PhpBaseline\Core\PathPatterns;
+use IanFlanagan\PhpIanfStrictBaseline\Core\PathPatterns;
 use Override;
 use PhpParser\Node;
 use PhpParser\Node\Stmt;

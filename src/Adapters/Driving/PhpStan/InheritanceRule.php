@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan;
+namespace IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan;
 
 use Override;
 use PhpParser\Node;
@@ -46,7 +46,7 @@ final readonly class InheritanceRule implements Rule
         }
 
         return [
-            RuleErrorBuilder::message("{$class->getDisplayName()} extends {$parent->getDisplayName()}. Take what it shares as a collaborator in the constructor instead, and implement an interface for the type. A framework base class goes in phpBaselineAllowedParentClasses.")
+            RuleErrorBuilder::message("{$class->getDisplayName()} extends {$parent->getDisplayName()}. Take what it shares as a collaborator in the constructor instead, and implement an interface for the type. A framework base class goes in phpIanfStrictBaselineAllowedParentClasses.")
                 ->identifier('phpBaseline.inheritance')
                 ->build(),
         ];

@@ -1,0 +1,38 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// The entrypoint: `php-ianf-strict-baseline verify` checks that the project in the working directory still
+// follows the baseline; `php-ianf-strict-baseline rulebook` prints how the baseline enforces the code
+// rulebook, as the coverage listing the rulebook checks.
+
+use IanFlanagan\PhpIanfStrictBaseline\Adapters\Driven\ProjectDirectory;
+use IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\Console\VerifyCommand;
+use IanFlanagan\PhpIanfStrictBaseline\Core\RulebookListing;
+use IanFlanagan\PhpIanfStrictBaseline\Orchestrators\Verify;
+
+$autoloaders = [__DIR__.'/../vendor/autoload.php', __DIR__.'/../../../autoload.php'];
+foreach ($autoloaders as $autoloader) {
+    if (is_file($autoloader)) {
+        require $autoloader;
+        break;
+    }
+}
+
+$root = getcwd();
+if ($root === false) {
+    fwrite(STDERR, "php-ianf-strict-baseline: can't read the working directory\n");
+    exit(1);
+}
+
+$command = array_slice($argv ?? [], 1);
+if ($command === ['verify']) {
+    exit(new VerifyCommand(new Verify(new ProjectDirectory($root)), $root)->run());
+}
+if ($command === ['rulebook']) {
+    echo RulebookListing::json();
+    exit(0);
+}
+fwrite(STDERR, "usage: php-ianf-strict-baseline verify | rulebook\n");
+exit(2);

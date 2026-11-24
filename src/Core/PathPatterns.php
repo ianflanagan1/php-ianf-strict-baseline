@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\Core;
+namespace IanFlanagan\PhpIanfStrictBaseline\Core;
 
 /**
  * Whether a file is in one of a config's paths, which are fnmatch() patterns from the project's

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IanFlanagan\PhpBaseline\Adapters\Driving\PhpStan;
+namespace IanFlanagan\PhpIanfStrictBaseline\Adapters\Driving\PhpStan;
 
-use IanFlanagan\PhpBaseline\Core\DependencyCycles;
+use IanFlanagan\PhpIanfStrictBaseline\Core\DependencyCycles;
 use LogicException;
 use Override;
 use PhpParser\Node;
@@ -14,8 +14,9 @@ use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
 /**
- * No class depends on itself through others. Each cycle is reported once, where its first class,
- * in name order, uses the next.
+ * No class depends on itself through others, with a sealed type and its variants counted as one
+ * class, as ClassDependencyCollector collects them. Each cycle is reported once, where its first
+ * class, in name order, uses the next.
  *
  * @implements Rule<CollectedDataNode>
  */
@@ -46,7 +47,7 @@ final class DependencyCycleRule implements Rule
             $first = $cycle[0];
             [$file, $line] = self::firstUseWithin($uses[$first], $cycle);
             $members = implode(', ', array_map(static fn (string $unit): string => $names[$unit], $cycle));
-            $errors[] = RuleErrorBuilder::message("These classes depend on each other in a cycle: {$members}. Break it: move what they share into a class that depends on none of them, or have one take another through an interface it declares.")
+            $errors[] = RuleErrorBuilder::message("These classes depend on each other in a cycle, a sealed type standing for its variants too: {$members}. Break it: move what they share into a class that depends on none of them, or have one take another through an interface it declares.")
                 ->identifier('phpBaseline.dependencyCycle')
                 ->file($file)
                 ->line($line)

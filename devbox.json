@@ -4,6 +4,7 @@
     "go-task@3.53.1",
     "php@8.5.12",
     "php85Packages.composer@2.10.3",
-    "go@1.27.3"
+    "go@1.27.3",
+    "github:ianflanagan1/coupled-tags-lint/v0.2.0#coupled-tags-lint"
   ]
 }

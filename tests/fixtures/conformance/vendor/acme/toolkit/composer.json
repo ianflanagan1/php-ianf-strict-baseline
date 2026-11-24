@@ -1,0 +1,13 @@
+{
+    "name": "acme/toolkit",
+    "description": "A fake third-party package the conformance fixture's core calls: pure code, and code that reaches an impure operation at some depth.",
+    "version": "1.0.0",
+    "autoload": {
+        "psr-4": {
+            "Acme\\Toolkit\\": "src/"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    }
+}

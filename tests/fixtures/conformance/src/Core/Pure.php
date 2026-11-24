@@ -10,9 +10,4 @@ final class Pure
     {
         return strtoupper($s);
     }
-
-    public function parse(string $date): \DateTimeImmutable|false
-    {
-        return \DateTimeImmutable::createFromFormat('Y-m-d', $date);
-    }
 }

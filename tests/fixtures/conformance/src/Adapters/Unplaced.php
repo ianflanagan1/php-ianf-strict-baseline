@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Adapters;
 
 /**
- * Under src/Adapters/ but in neither Driving/ nor Driven/, so it is an orchestrator, and the clock
- * it reads is reported.
+ * Under src/Adapters/ but in neither Driving/ nor Driven/, so it has no role, and the clock it
+ * reads is reported.
  */
 final class Unplaced
 {

@@ -7,14 +7,16 @@ tasks:
       - 'composer install --no-interaction'
 
   check:
-    desc: composer.json, the tests (which include the conformance tests), PHPStan, deptrac, Pint and the rulebook listing
+    desc: composer.json, php-ianf-strict-baseline verify, the tests (which include the conformance tests), PHPStan, deptrac, Pint, the rulebook listing and the COUPLED tags
     cmds:
       - 'composer validate --strict'
+      - 'php bin/php-ianf-strict-baseline verify'
       - 'vendor/bin/phpunit --colors=never'
       - 'vendor/bin/phpstan analyse --no-progress'
       - 'vendor/bin/deptrac analyse --no-progress'
       - 'vendor/bin/pint --test'
       - task: rulebook
+      - coupled-tags-lint
 
   format:
     desc: Format every file
@@ -29,15 +31,15 @@ tasks:
       - '{{if .PHP_FILES}}vendor/bin/pint {{.PHP_FILES}} && vendor/bin/phpstan analyse --no-progress {{.PHP_FILES}}{{end}}'
 
   rulebook-coverage:
-    desc: Write rulebook-coverage.json, how php-baseline enforces the code rulebook
+    desc: Write rulebook-coverage.json, how php-ianf-strict-baseline enforces the code rulebook
     cmds:
-      - 'php bin/php-baseline rulebook > rulebook-coverage.json'
+      - 'php bin/php-ianf-strict-baseline rulebook > rulebook-coverage.json'
 
   rulebook:
     desc: Check rulebook-coverage.json against the release of the code rulebook it is assessed for
     vars:
       # Moving to a new release means assessing what it changed.
-      RULEBOOK_RELEASE: v0.1.0
+      RULEBOOK_RELEASE: v0.3.0
     env:
       # code-rulebook is private; Git needs access to it, as the README says.
       GOPRIVATE: github.com/ianflanagan1/code-rulebook
