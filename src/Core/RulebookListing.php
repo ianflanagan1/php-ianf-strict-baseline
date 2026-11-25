@@ -10,9 +10,7 @@ use JsonException;
  * How php-ianf-strict-baseline enforces each clause of the code rulebook
  * (github.com/ianflanagan1/code-rulebook), as the coverage listing the rulebook checks.
  *
- * COUPLED:coverage-listing-schema:[same-shape; //github.com/ianflanagan1/code-rulebook/schema/coverage.schema.json; //github.com/ianflanagan1/code-rulebook/internal/core/rulebook/model.go;
- * //github.com/ianflanagan1/go-ianf-strict-baseline/internal/core/rulebook/rulebook.go;
- * //github.com/ianflanagan1/ts-ianf-strict-baseline/src/core/listing.ts] fields, check kinds and coverage levels
+ * COUPLED:coverage-listing-schema: rulebook-listing. Fields, check kinds and coverage levels
  */
 final class RulebookListing
 {

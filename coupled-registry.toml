@@ -1,0 +1,20 @@
+version = 1
+
+["COUPLED:coverage-listing-schema:"]
+relations = ["same-shape"]
+files = ["//github.com/ianflanagan1/code-rulebook/schema/coverage.schema.json", "//github.com/ianflanagan1/code-rulebook/internal/core/rulebook/model.go", "//github.com/ianflanagan1/go-ianf-strict-baseline/internal/core/rulebook/rulebook.go", "//github.com/ianflanagan1/ts-ianf-strict-baseline/src/core/listing.ts"]
+why = "code-rulebook checks each baseline's rulebook-coverage.json against its coverage schema and reads it with its Go model, so the listing every baseline writes must have the schema's fields"
+
+["COUPLED:tool-cache-dir:"]
+relations = ["="]
+files = ["//github.com/ianflanagan1/code-rulebook/rulebook/setups/ianf-strict/rules/project/tool-caches-are-ignored.yaml", "//github.com/ianflanagan1/code-rulebook/rulebook/setups/ianf-strict/baselines.md", "//github.com/ianflanagan1/go-ianf-strict-baseline/internal/core/baseline/baseline.go", "//github.com/ianflanagan1/ts-ianf-strict-baseline/src/core/findProblems.ts"]
+
+# Written by coupled --update: each group as it was last reviewed. Don't edit below this line.
+
+[reviewed."COUPLED:coverage-listing-schema:"]
+definition = "563fbdab97c74627"
+"COUPLED:coverage-listing-schema: rulebook-listing" = { block = "c5913b0b09b3bba4" }
+
+[reviewed."COUPLED:tool-cache-dir:"]
+definition = "1f1b2682b4fd6d0c"
+"COUPLED:tool-cache-dir: project-problems" = {}

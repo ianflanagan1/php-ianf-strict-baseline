@@ -7,7 +7,7 @@ tasks:
       - 'composer install --no-interaction'
 
   check:
-    desc: composer.json, php-ianf-strict-baseline verify, the tests (which include the conformance tests), PHPStan, deptrac, Pint, the rulebook listing and the COUPLED tags
+    desc: composer.json, php-ianf-strict-baseline verify, the tests (which include the conformance tests), PHPStan, deptrac, Pint, the rulebook listing and the COUPLED markers
     cmds:
       - 'composer validate --strict'
       - 'php bin/php-ianf-strict-baseline verify'
@@ -16,7 +16,7 @@ tasks:
       - 'vendor/bin/deptrac analyse --no-progress'
       - 'vendor/bin/pint --test'
       - task: rulebook
-      - coupled-tags-lint
+      - coupled
 
   format:
     desc: Format every file
