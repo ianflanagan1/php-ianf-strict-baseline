@@ -56,7 +56,6 @@ final class RulebookListing
                 'value' => self::CORE,
                 'fake' => 'By directory, not from the code: files under src/Fakes/, and classes of my dependencies in a \\Fakes\\ namespace, whether or not a class there implements a port. Each is named Fake and its port\'s name, which nothing checks. Like any class under src/ outside the adapters\' directories, it may perform no impure operation the bans list. A port\'s implementation under tests/ is treated as test code. '.self::NO_HELPERS,
             ],
-            'reviewed-roles' => ['entrypoint', 'driving-adapter', 'driven-adapter'],
             'checks' => [
                 'deptrac-layers' => [
                     'kind' => 'tool',
@@ -64,7 +63,7 @@ final class RulebookListing
                     'summary' => "Layers by directory, which is how the checks tell the roles: src/Core/ is the core, decision and value code alike, src/Ports/ the ports, src/Orchestrators/ orchestrator code, and src/Adapters/Driving/ and src/Adapters/Driven/ the two adapters' code. src/Fakes/ holds the fakes, which reference only the core and ports, and src/Testing/ the test code a project ships for the tests of projects that require it, such as an assertion, which references only the core, ports and fakes; no role's code references either. Any other class under src/ is Unplaced, which may reference nothing and which nothing may reference. A dependency of mine, in IanFlanagan\\<Project>\\, is layered by the same names in its namespace. The core references nothing else, ports only the core, orchestrators and driven adapters only the core and ports, and driving adapters only the core and orchestrators. Every reference counts: an import, a qualified name and a name in the same namespace.",
                 ],
                 'scripts-unimportable' => [
-                    'kind' => 'language',
+                    'kind' => 'built-in',
                     'summary' => 'An entrypoint is a script in bin/ or public/, not a class, so no class can reference it.',
                 ],
                 'disallowed-effects' => [
@@ -100,7 +99,7 @@ final class RulebookListing
                 'inheritance' => self::rule("InheritanceRule: a class extends only a class phpIanfStrictBaselineAllowedParentClasses names, PHPUnit's TestCase by default, or one of PHP's own exceptions."),
                 'phpstan-checked-exceptions' => self::phpstan("PHPStan, with exceptions.check.missingCheckedExceptionInThrows, reports a function or method that throws a checked exception, or lets one escape from a call, with no @throws tag for it, and with exceptions.check.throwTypeCovariance, an implementation whose @throws tag names an exception that its interface's @throws tag doesn't. config/phpstan.neon turns both on, and leaves every exception checked but Error, LogicException, RuntimeException, Random\\RandomException and their subclasses."),
                 'constant-property-defaults' => [
-                    'kind' => 'language',
+                    'kind' => 'built-in',
                     'summary' => "PHP compiles a property's default only when it is a constant expression: a call, a static call or a new there is a fatal error when the file is compiled.",
                 ],
                 'parameter-default' => self::rule('ParameterDefaultRule: no parameter has a default value, except in a method that overrides or implements another.'),
@@ -206,7 +205,7 @@ final class RulebookListing
 
             // ports-belong-to-their-callers
             'port-is-declared-by-its-caller' => self::full(['deptrac-layers'], 'test_port_is_declared_by_its_caller') + ['note' => 'A PHP driven adapter has to name the interface it implements, so ports are a layer of their own, in src/Ports/: orchestrators and driven adapters may reference it, and it may reference only the core. No adapter can declare a port, since no orchestrator may reference an adapter.'],
-            'port-units-of-code-follow-interface-implementation' => ['case' => 'nominal'] + self::partial(['deptrac-layers'], "An interface declared in an orchestrator's file is reported only once a driven adapter implements it, as a driven adapter that references an orchestrator.", 'test_port_units_of_code_follow_interface_implementation', self::planned()) + ['note' => 'The checks ask for more than the clause does. They tell a port by its directory, so an interface in a file of its own under src/Orchestrators/ is taken as orchestrator code, and a driven adapter that implements it is reported too.'],
+            'port-units-of-code-follow-interface-implementation' => self::partial(['deptrac-layers'], "An interface declared in an orchestrator's file is reported only once a driven adapter implements it, as a driven adapter that references an orchestrator.", 'test_port_units_of_code_follow_interface_implementation', self::planned()) + ['note' => 'The checks ask for more than the clause does. They tell a port by its directory, so an interface in a file of its own under src/Orchestrators/ is taken as orchestrator code, and a driven adapter that implements it is reported too.'],
             'port-is-named-in-domain-terms' => self::convention('README.md, Roles', self::declined("Whether a name is in the domain's terms, or a method is shaped for one thing its caller does, is a judgement no static check can make.")),
 
             // ports-have-no-call-order
@@ -222,7 +221,7 @@ final class RulebookListing
             // values-decide-nothing
             'value-code-references-only-value-code' => self::partial(['deptrac-layers'], self::NO_DECISIONS." A core type that references decision code isn't reported; one that references code of any other role is.", 'test_value_code_references_only_value_code', self::planned()),
             'value-code-decides-nothing' => self::noneDeclined('Whether a method derives a value by a rule that is part of what the value is, or answers a question a use case asks of it, is a judgement about what the code means, which no static check can make.'),
-            'ports-reference-only-value-code' => ['case' => 'nominal'] + self::partial(['deptrac-layers'], self::NO_DECISIONS." A port whose method takes a decision service, or returns an interface declared in decision code, isn't reported; one that references code of any other role is.", 'test_ports_reference_only_value_code', self::planned()),
+            'ports-reference-only-value-code' => self::partial(['deptrac-layers'], self::NO_DECISIONS." A port whose method takes a decision service, or returns an interface declared in decision code, isn't reported; one that references code of any other role is.", 'test_ports_reference_only_value_code', self::planned()),
         ];
     }
 
@@ -272,7 +271,7 @@ final class RulebookListing
                 'proof' => [self::conformance('test_field_initialisers_are_constants'), self::conformance('test_field_initialisers_are_constants_misses_closures')],
                 'note' => "A promoted property's default is its parameter's, where PHP allows new, and parameter-default reports it.",
             ] + self::planned(),
-            'core-types-have-factory-functions' => ['case' => 'private-constructors'] + self::none(),
+            'core-types-have-factory-functions' => self::none(),
             'core-types-are-built-only-by-their-factory-functions' => self::noneBecause('PHP rejects a call to a private constructor from outside its class, and a write to a readonly property, but nothing makes a core type declare either, which core-types-have-factory-functions is for.'),
             'no-standard-library-or-third-party-code-builds-core-types' => self::partial(['disallowed-construction'], "An object mapper or a deserialiser from a library, such as Symfony Serializer or Valinor, isn't reported, which the dependency list is for.", 'test_no_standard_library_or_third_party_code_builds_core_types', self::planned()) + ['note' => 'The bans ask for more than the clause does: they report each of these calls whatever class it builds, a core type or not.'],
             'one-factory-function-calls-each-constructor' => self::none(),
@@ -285,12 +284,12 @@ final class RulebookListing
             'collection-types-name-their-element-type' => self::full(['phpstan-missing-types'], 'test_collection_types_name_their_element_type') + ['note' => self::LEVEL_CAN_BE_LOWERED],
 
             // fields-are-set-once
-            'fields-are-declared-read-only' => ['case' => 'supported'] + self::none(),
+            'fields-are-declared-read-only' => self::none(),
             'fields-are-assigned-only-at-construction' => self::none(),
             'field-collections-are-not-changed' => self::none(),
 
             // locals-are-not-reassigned
-            'core-locals-are-not-reassigned-once-read' => ['case' => 'unsupported'] + self::none(),
+            'core-locals-are-not-reassigned-once-read' => self::none(),
 
             // no-boolean-parameters-or-fields
             'no-boolean-parameters' => self::none(),
@@ -301,18 +300,18 @@ final class RulebookListing
             'no-optional-parameters' => self::full(['parameter-default'], 'test_no_parameter_default_values') + ['note' => 'A PHP parameter is optional only through a default value, or by being variadic, which is not checked.'],
 
             // no-inheritance
-            'classes-extend-only-allowed-bases' => ['case' => 'supported'] + self::full(['inheritance'], 'test_classes_extend_only_allowed_bases') + ['note' => "PHP's own exceptions may be extended, since a throwable class can't be written any other way."],
-            'classes-are-final' => ['case' => 'supported'] + self::none(),
+            'classes-extend-only-allowed-bases' => self::full(['inheritance'], 'test_classes_extend_only_allowed_bases') + ['note' => "PHP's own exceptions may be extended, since a throwable class can't be written any other way."],
+            'classes-are-final' => self::none(),
             'types-declare-every-method-they-have' => self::none(),
 
             // no-nullable-fields
             'core-type-fields-are-not-nullable' => self::none(),
 
             // only-calls-run-code
-            'field-access-runs-no-code' => ['case' => 'supported'] + self::none(),
-            'conversions-run-no-code' => ['case' => 'supported'] + self::none(),
-            'only-the-constructor-is-a-magic-method' => ['case' => 'supported'] + self::none(),
-            'iteration-runs-no-code' => ['case' => 'supported'] + self::none(),
+            'field-access-runs-no-code' => self::none(),
+            'conversions-run-no-code' => self::none(),
+            'only-the-constructor-is-a-magic-method' => self::none(),
+            'iteration-runs-no-code' => self::none(),
             'no-hooks-reached-through-catch-all-parameters' => self::none(),
             'nothing-runs-when-a-value-is-collected' => self::none(),
 
@@ -322,7 +321,7 @@ final class RulebookListing
 
             // parameters-are-not-reassigned
             'parameters-are-not-reassigned' => self::none(),
-            'no-reference-parameters' => ['case' => 'supported'] + self::none(),
+            'no-reference-parameters' => self::none(),
 
             // shapes-follow-roles
             'every-type-has-one-shape' => self::none(),
@@ -340,7 +339,7 @@ final class RulebookListing
             ] + self::planned(),
 
             // values-are-grouped-by-name
-            'no-positional-groups' => ['case' => 'tuples'] + self::none(),
+            'no-positional-groups' => self::none(),
 
             // values-are-not-changed-once-built
             'built-values-are-not-changed' => self::none(),
@@ -351,7 +350,7 @@ final class RulebookListing
 
             // values-have-immutable-types
             'values-have-immutable-types' => self::none(),
-            'collection-types-are-immutable' => ['case' => 'copied-on-assignment'] + self::none(),
+            'collection-types-are-immutable' => self::none(),
         ];
     }
 
@@ -362,7 +361,7 @@ final class RulebookListing
     {
         return [
             // core-does-not-throw
-            'core-throws-nothing' => ['case' => 'needs-nothing'] + self::errors(self::planned()),
+            'core-throws-nothing' => self::errors(self::planned()),
             'core-catches-expected-failures-it-calls' => [
                 'coverage' => 'partial',
                 'checks' => ['phpstan-checked-exceptions'],
@@ -387,7 +386,7 @@ final class RulebookListing
             'error-types-of-other-roles-are-not-matched' => self::partial(['deptrac-layers'], "Only a match on an exception class in a directory the matching code's role may not reference is reported, a first-party dependency's among them. A match in an entrypoint isn't checked, and neither is a driving adapter's match on an exception class under src/Orchestrators/, which its role may reference.", 'test_error_types_of_other_roles_are_not_matched', self::planned()),
 
             // orchestrators-return-failures
-            'orchestrator-code-throws-nothing' => ['case' => 'needs-nothing'] + self::errors(self::planned()),
+            'orchestrator-code-throws-nothing' => self::errors(self::planned()),
             'orchestrator-code-catches-nothing' => self::errors(self::planned()),
 
             // ports-return-expected-failures

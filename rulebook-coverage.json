@@ -11,11 +11,6 @@
         "value": "By directory, not from the code: files under src/Core/, and classes of my dependencies in a \\Core\\ namespace. The checks don't tell a decision from a value: both are the one Core layer, so nothing that turns on the difference between them is checked. It has no helpers.",
         "fake": "By directory, not from the code: files under src/Fakes/, and classes of my dependencies in a \\Fakes\\ namespace, whether or not a class there implements a port. Each is named Fake and its port's name, which nothing checks. Like any class under src/ outside the adapters' directories, it may perform no impure operation the bans list. A port's implementation under tests/ is treated as test code. The checks tell no helper class from a member: every class there counts as a member, and a helper is a private method."
     },
-    "reviewed-roles": [
-        "entrypoint",
-        "driving-adapter",
-        "driven-adapter"
-    ],
     "checks": {
         "deptrac-layers": {
             "kind": "tool",
@@ -23,7 +18,7 @@
             "summary": "Layers by directory, which is how the checks tell the roles: src/Core/ is the core, decision and value code alike, src/Ports/ the ports, src/Orchestrators/ orchestrator code, and src/Adapters/Driving/ and src/Adapters/Driven/ the two adapters' code. src/Fakes/ holds the fakes, which reference only the core and ports, and src/Testing/ the test code a project ships for the tests of projects that require it, such as an assertion, which references only the core, ports and fakes; no role's code references either. Any other class under src/ is Unplaced, which may reference nothing and which nothing may reference. A dependency of mine, in IanFlanagan\\<Project>\\, is layered by the same names in its namespace. The core references nothing else, ports only the core, orchestrators and driven adapters only the core and ports, and driving adapters only the core and orchestrators. Every reference counts: an import, a qualified name and a name in the same namespace."
         },
         "scripts-unimportable": {
-            "kind": "language",
+            "kind": "built-in",
             "summary": "An entrypoint is a script in bin/ or public/, not a class, so no class can reference it."
         },
         "disallowed-effects": {
@@ -139,7 +134,7 @@
             "summary": "PHPStan, with exceptions.check.missingCheckedExceptionInThrows, reports a function or method that throws a checked exception, or lets one escape from a call, with no @throws tag for it, and with exceptions.check.throwTypeCovariance, an implementation whose @throws tag names an exception that its interface's @throws tag doesn't. config/phpstan.neon turns both on, and leaves every exception checked but Error, LogicException, RuntimeException, Random\\RandomException and their subclasses."
         },
         "constant-property-defaults": {
-            "kind": "language",
+            "kind": "built-in",
             "summary": "PHP compiles a property's default only when it is a constant expression: a call, a static call or a new there is a fatal error when the file is compiled."
         },
         "parameter-default": {
@@ -481,7 +476,6 @@
             "note": "A PHP driven adapter has to name the interface it implements, so ports are a layer of their own, in src/Ports/: orchestrators and driven adapters may reference it, and it may reference only the core. No adapter can declare a port, since no orchestrator may reference an adapter."
         },
         "port-units-of-code-follow-interface-implementation": {
-            "case": "nominal",
             "coverage": "partial",
             "checks": [
                 "deptrac-layers"
@@ -542,7 +536,6 @@
             "reason": "Whether a method derives a value by a rule that is part of what the value is, or answers a question a use case asks of it, is a judgement about what the code means, which no static check can make."
         },
         "ports-reference-only-value-code": {
-            "case": "nominal",
             "coverage": "partial",
             "checks": [
                 "deptrac-layers"
@@ -675,7 +668,6 @@
             "intent": "planned"
         },
         "core-types-have-factory-functions": {
-            "case": "private-constructors",
             "coverage": "none",
             "intent": "planned"
         },
@@ -745,7 +737,6 @@
             "note": "A project that sets a lower PHPStan level loses the check, which type-checker-runs-at-its-strictest is for."
         },
         "fields-are-declared-read-only": {
-            "case": "supported",
             "coverage": "none",
             "intent": "planned"
         },
@@ -758,7 +749,6 @@
             "intent": "planned"
         },
         "core-locals-are-not-reassigned-once-read": {
-            "case": "unsupported",
             "coverage": "none",
             "intent": "planned"
         },
@@ -790,7 +780,6 @@
             "note": "A PHP parameter is optional only through a default value, or by being variadic, which is not checked."
         },
         "classes-extend-only-allowed-bases": {
-            "case": "supported",
             "coverage": "full",
             "checks": [
                 "inheritance"
@@ -801,7 +790,6 @@
             "note": "PHP's own exceptions may be extended, since a throwable class can't be written any other way."
         },
         "classes-are-final": {
-            "case": "supported",
             "coverage": "none",
             "intent": "planned"
         },
@@ -814,22 +802,18 @@
             "intent": "planned"
         },
         "field-access-runs-no-code": {
-            "case": "supported",
             "coverage": "none",
             "intent": "planned"
         },
         "conversions-run-no-code": {
-            "case": "supported",
             "coverage": "none",
             "intent": "planned"
         },
         "only-the-constructor-is-a-magic-method": {
-            "case": "supported",
             "coverage": "none",
             "intent": "planned"
         },
         "iteration-runs-no-code": {
-            "case": "supported",
             "coverage": "none",
             "intent": "planned"
         },
@@ -854,7 +838,6 @@
             "intent": "planned"
         },
         "no-reference-parameters": {
-            "case": "supported",
             "coverage": "none",
             "intent": "planned"
         },
@@ -899,7 +882,6 @@
             "intent": "planned"
         },
         "no-positional-groups": {
-            "case": "tuples",
             "coverage": "none",
             "intent": "planned"
         },
@@ -920,12 +902,10 @@
             "intent": "planned"
         },
         "collection-types-are-immutable": {
-            "case": "copied-on-assignment",
             "coverage": "none",
             "intent": "planned"
         },
         "core-throws-nothing": {
-            "case": "needs-nothing",
             "coverage": "convention-only",
             "where": "README.md, Errors",
             "intent": "planned"
@@ -991,7 +971,6 @@
             "intent": "planned"
         },
         "orchestrator-code-throws-nothing": {
-            "case": "needs-nothing",
             "coverage": "convention-only",
             "where": "README.md, Errors",
             "intent": "planned"
