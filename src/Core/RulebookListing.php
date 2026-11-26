@@ -471,7 +471,7 @@ final class RulebookListing
             'formatter-settings-come-from-the-baseline' => self::convention("README.md, Use: pint.json extends the baseline's config/pint.json", self::planned()),
 
             // checks-run-at-full-strength
-            'type-checker-runs-at-its-strictest' => self::convention('README.md, Use: a project sets no lower level', self::planned()) + ['note' => 'config/phpstan.neon sets level 10, and nothing reports a project whose own phpstan.neon sets a lower one.'],
+            'type-checker-runs-at-its-strictest' => self::convention('README.md, Use: a project sets level 10', self::planned()) + ['note' => 'PHPStan takes the level only from a project\'s own phpstan.neon and what it includes directly, so config/phpstan.neon can\'t set it, and nothing reports a project whose phpstan.neon sets a lower level or none.'],
             'baseline-settings-are-not-weakened' => self::convention("README.md, Use: a project turns off nothing the baseline's configs turn on", self::planned()),
             'checks-are-not-suppressed' => self::convention('README.md, Use: a project ignores no error and excludes none of its code', self::planned()),
             'check-task-runs-every-baseline-check' => self::convention('README.md, Use: what the check task runs', self::planned()),

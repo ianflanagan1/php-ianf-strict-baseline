@@ -101,11 +101,12 @@ services:
             - phpstan.rules.rule
 
 parameters:
-    # PHPStan's strictest level. From level 4 it reports a match that leaves out a case, from 6 a
-    # parameter, return value or property with no type and an array with no value type, and from 9
-    # and 10 anything done with a mixed but testing it or passing it on. A project sets no lower
-    # level.
-    level: 10
+    # No level: PHPStan reads it, as it reads tmpDir, only from a project's own config and the files
+    # that includes directly, never from this file as extension-installer includes it, so each
+    # project sets level 10, PHPStan's strictest, in its phpstan.neon. From level 4 PHPStan reports
+    # a match that leaves out a case, from 6 a parameter, return value or property with no type and
+    # an array with no value type, and from 9 and 10 anything done with a mixed but testing it or
+    # passing it on.
     # A method that overrides or implements another carries #[\Override], so PHPStan reports it
     # once the method it overrides is renamed or removed.
     checkMissingOverrideMethodAttribute: true

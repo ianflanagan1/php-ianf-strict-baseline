@@ -3,6 +3,8 @@ includes:
     - ../../../config/phpstan.neon
 
 parameters:
+    # As a project sets it: PHPStan reads the level only from this file and what it includes directly.
+    level: 10
     paths:
         - src
         - bin

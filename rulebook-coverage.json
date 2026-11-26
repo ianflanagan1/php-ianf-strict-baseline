@@ -1131,9 +1131,9 @@
         },
         "type-checker-runs-at-its-strictest": {
             "coverage": "convention-only",
-            "where": "README.md, Use: a project sets no lower level",
+            "where": "README.md, Use: a project sets level 10",
             "intent": "planned",
-            "note": "config/phpstan.neon sets level 10, and nothing reports a project whose own phpstan.neon sets a lower one."
+            "note": "PHPStan takes the level only from a project's own phpstan.neon and what it includes directly, so config/phpstan.neon can't set it, and nothing reports a project whose phpstan.neon sets a lower level or none."
         },
         "baseline-settings-are-not-weakened": {
             "coverage": "convention-only",

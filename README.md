@@ -127,7 +127,7 @@ The project's `check` task runs `vendor/bin/php-ianf-strict-baseline verify`, `v
 
 The tools keep their caches under `cache/`: the shipped deptrac config puts deptrac's in `cache/deptrac/`, and Pint leaves the directory alone. Point PHPStan's and PHPUnit's there too, with `tmpDir: cache/phpstan` in `phpstan.neon`'s `parameters` and `cacheDirectory="cache/phpunit"` in `phpunit.xml`. PHPStan reads `tmpDir` only from the project's own config and the files it includes directly, so `config/phpstan.neon` can't set it for a project that uses extension-installer. `verify` fails unless `.gitignore` has the line `/cache/`.
 
-`config/phpstan.neon` sets level 10. A project's own `phpstan.neon` sets no lower level, turns off nothing the baseline's configs turn on, ignores no error, whether in its configuration or with a `@phpstan-ignore` comment, and excludes none of its hand-written code. Nothing checks this yet.
+A project's own `phpstan.neon` sets `level: 10`, PHPStan's strictest. PHPStan reads the level, as it reads `tmpDir`, only from the project's own config and the files it includes directly, so `config/phpstan.neon` can't set it for a project that uses extension-installer, and a project that sets none runs no rules at all. The project's `phpstan.neon` also turns off nothing the baseline's configs turn on, ignores no error, whether in its configuration or with a `@phpstan-ignore` comment, and excludes none of its hand-written code. Nothing checks this yet.
 
 Run PHPStan and deptrac from the project's root: the paths in both configs are from there.
 
